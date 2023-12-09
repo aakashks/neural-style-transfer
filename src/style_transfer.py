@@ -9,9 +9,6 @@ import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
 from torchvision.models import vgg19, VGG19_Weights
 
-import matplotlib
-matplotlib.use("TKAgg")
-
 device = "cuda" if torch.cuda.is_available() else "cpu"
 torch.set_default_device(device)
 
