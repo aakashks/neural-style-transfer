@@ -1,1 +1,1 @@
-python .\src\main.py --content .\images\neckarfront.jpg --style .\images\vangogh-starry-night.jpg --steps 100
+python ./src/main.py --style_weight 1000000 --steps 100

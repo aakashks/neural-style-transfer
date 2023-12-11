@@ -10,23 +10,21 @@ import torchvision.transforms as transforms
 from torchvision.models import vgg19, VGG19_Weights
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-torch.set_default_device(device)
 
 cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406])
 cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225])
 
 # desired size of the output image
-imsize = (192, 256)  # use small size if no GPU
-loader = transforms.Compose(
-    [
-        transforms.Resize(imsize),  # scale imported image
-        transforms.ToTensor(),  # transform it into a torch tensor
-        transforms.Normalize(cnn_normalization_mean, cnn_normalization_std),
-    ]
-)
 
 
-def image_loader(image_name):
+def image_loader(image_name, imsize):
+    loader = transforms.Compose(
+        [
+            transforms.Resize(imsize),  # scale imported image
+            transforms.ToTensor(),  # transform it into a torch tensor
+            transforms.Normalize(cnn_normalization_mean, cnn_normalization_std),
+        ]
+    )
     image = Image.open(image_name)
     # fake batch dimension required to fit network's input dimensions
     image = loader(image).unsqueeze(0)
@@ -34,15 +32,12 @@ def image_loader(image_name):
 
 
 def imshow(tensor, title=None):
-    unloader = transforms.Compose(
-        [
-            transforms.Normalize(
-                -cnn_normalization_mean / cnn_normalization_std,
-                1 / cnn_normalization_std,
-            ),
-            transforms.ToPILImage(),
-        ]
-    )  # reconvert into PIL image
+    unloader = transforms.Compose([
+        transforms.Normalize(-cnn_normalization_mean/cnn_normalization_std, 1/cnn_normalization_std),
+        transforms.Lambda(lambda x: x.clamp_(0, 1)),
+        transforms.ToPILImage(), 
+    ])  # reconvert into PIL image
+    
     image = tensor.cpu().clone()  # we clone the tensor to not do changes on it
     image = image.squeeze(0)  # remove the fake batch dimension
     image = unloader(image)
@@ -172,13 +167,13 @@ def run_style_transfer(
     cnn,
     content_img_path,
     style_img_path,
+    imsize=128,
     style_weight=1e6,
     content_weight=1,
-    tv_weight=1e-10,
     num_steps=200,
 ):
-    style_img = image_loader(style_img_path)
-    content_img = image_loader(content_img_path)
+    style_img = image_loader(style_img_path, imsize)
+    content_img = image_loader(content_img_path, imsize)
     input_img = torch.randn(content_img.shape, device=device, dtype=torch.float) / 1e2
 
     model, content_losses, style_losses, tv_losses = get_model_and_losses(
@@ -214,7 +209,7 @@ def run_style_transfer(
 
             style_score *= style_weight
             content_score *= content_weight
-            tv_score *= tv_weight
+            # tv_score *= tv_weight
 
             loss = style_score + content_score
 
