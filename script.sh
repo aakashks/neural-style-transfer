@@ -1,1 +1,1 @@
-python ./src/main.py --style_weight 1000000 --steps 100
+python ./main.py --imsize=512 --steps=300 --output_path ./results/nck1.png
