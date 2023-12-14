@@ -1,6 +1,6 @@
 import torch.optim as optim
 
-from utils.image import *
+from utils.image_utils import *
 from utils.losses import *
 from utils.fm_extractor import *
 
@@ -25,8 +25,8 @@ def run_style_transfer(
     num_steps=200,
     step_size=50,
 ):
-    content_img = image_loader(content_img, imsize)
-    style_img = image_loader(style_img, imsize)
+    content_img = loader(content_img, imsize)
+    style_img = loader(style_img, imsize)
     input_img = content_img.clone().requires_grad_(True)
 
     model.eval().requires_grad_(False)
