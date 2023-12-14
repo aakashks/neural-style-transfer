@@ -1,1 +1,1 @@
-python ./main.py --imsize=512 --steps=300 --output_path ./results/nck1.png
+python ./main.py --imsize=768 --steps=500 --output_path ./results/nck1.png

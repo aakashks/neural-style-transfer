@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument("--output_path", type=str, default="results/result.png")
     args = parser.parse_args()
 
-    cnn = vgg19(weights=VGG19_Weights.DEFAULT).features.eval()
+    cnn = vgg19(weights=VGG19_Weights.DEFAULT, progress=False).features.eval()
 
     output_img = run_style_transfer(
         cnn,
@@ -26,6 +26,7 @@ if __name__ == "__main__":
         args.imsize,
         args.style_weight,
         args.content_weight,
+        args.hist_weight,
         args.steps,
         args.step_size,
     )
